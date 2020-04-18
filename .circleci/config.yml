@@ -1,0 +1,22 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10.5.0
+    steps:
+      - checkout
+      - run:
+          name: install
+          command: yarn install
+      - run:
+          name: lint
+          command: yarn lint
+      - run:
+          name: test
+          command: yarn test
+      - run:
+          name: report-coverage
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              yarn report-coverage
+            fi

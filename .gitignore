@@ -1,0 +1,8 @@
+node_modules
+coverage
+.DS_Store
+.coveralls.yml
+*.log
+.vscode
+dist
+
