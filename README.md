@@ -3,7 +3,7 @@
 ![CircleCI](https://img.shields.io/circleci/build/github/gactjs/store?style=for-the-badge)
 ![Coveralls github](https://img.shields.io/coveralls/github/gactjs/store?style=for-the-badge)
 ![GitHub](https://img.shields.io/github/license/gactjs/store?style=for-the-badge)
-![npm](https://img.shields.io/npm/v/@gact/store?store=for-the-badge)
+![npm](https://img.shields.io/npm/v/@gact/store?style=for-the-badge)
 ![npm bundle size](https://img.shields.io/bundlephobia/min/@gact/store?style=for-the-badge)
 
 The Gact store combines a carefully engineered `StoreValue` and **access layer** to achieve: a **decoupled state interface**, **serializability**, **immutability**, **exact change tracking**, and **event sourcing** with practically zero boilerplate and overhead. The fusion of the aforementioned features forms the only suitable state model for UIs: an **accountable centralized state tree**.
