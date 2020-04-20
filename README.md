@@ -118,3 +118,8 @@ const state = {
 // Set {[], ["a"], ["a", "b"], ["a", "b", "c"], ["a", "b", "c", "d"], ["a", "b", "e"], ["a", "b", "e", 0], ["a", "b", "f"] }
 const pathLineage = computePathLineage(["a", "b"], value);
 ```
+
+## Further Reading
+
+- [Gact Store White Paper](https://github.com/gactjs/store/blob/master/docs/white-paper.md)
+- [Death of Component State](https://github.com/gactjs/store/blob/master/docs/death-of-component-state.md)
