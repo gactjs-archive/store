@@ -11,9 +11,9 @@ import { StoreValue, Path, PathFactory, PathFactoryResult } from "../types";
  *
  * @typeParam S - the state tree
  */
-export default function createPathFactory<
-  S extends StoreValue
->(): PathFactoryResult<S> {
+export function createPathFactory<S extends StoreValue>(): PathFactoryResult<
+  S
+> {
   const canonicalPaths: Map<string, readonly string[]> = new Map();
 
   function fromFactory(path: Path<S>): boolean {

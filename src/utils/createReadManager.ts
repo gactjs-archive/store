@@ -1,6 +1,6 @@
-import isPrimitive from "./isPrimitive";
-import isContainer from "./isContainer";
-import cloneComplex from "./cloneComplex";
+import { isPrimitive } from "./isPrimitive";
+import { isContainer } from "./isContainer";
+import { cloneComplex } from "./cloneComplex";
 import {
   StoreValue,
   Complex,
@@ -13,9 +13,7 @@ import {
 /**
  * Creates a `ReadManager`
  */
-export default function createReadManager<S extends StoreValue>(): ReadManager<
-  S
-> {
+export function createReadManager<S extends StoreValue>(): ReadManager<S> {
   const frozenClones: Map<string, StoreValue> = new Map();
 
   /**

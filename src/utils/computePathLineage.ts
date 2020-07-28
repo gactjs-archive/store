@@ -1,4 +1,4 @@
-import isContainer from "./isContainer";
+import { isContainer } from "./isContainer";
 import { StoreValue, PathFor, Path, ValueAt, Value } from "../types";
 
 function computeAncestorPaths<
@@ -46,7 +46,7 @@ function computeDescendantPaths<
  * @typeParam P - the path
  * @typeParam V - the value in S at P
  */
-export default function computePathLineage<
+export function computePathLineage<
   S extends StoreValue,
   P extends Path<S>,
   V extends StoreValue

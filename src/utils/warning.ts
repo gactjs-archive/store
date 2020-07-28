@@ -1,4 +1,4 @@
-export default function warning(message: string): void {
+export function warning(message: string): void {
   if (typeof console !== "undefined" && typeof console.error === "function") {
     // tslint:disable-next-line no-console
     console.error(message);

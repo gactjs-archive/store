@@ -1,4 +1,4 @@
-import getContainer from "../../src/utils/getContainer";
+import { getContainer } from "../../src/utils/getContainer";
 
 describe("getContainer", function() {
   test("gets container", function() {

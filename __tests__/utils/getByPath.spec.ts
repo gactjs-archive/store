@@ -1,4 +1,4 @@
-import getByPath from "../../src/utils/getByPath";
+import { getByPath } from "../../src/utils/getByPath";
 
 describe("getByPath", function() {
   test("get root", function() {

@@ -1,6 +1,6 @@
 {
   "name": "@gact/store",
-  "version": "0.0.0-rc.1",
+  "version": "0.0.0-rc.2",
   "description": "Accountable centralized state tree",
   "keywords": [
     "store",

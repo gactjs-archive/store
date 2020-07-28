@@ -1,4 +1,4 @@
-import { createStore } from "../src";
+import { createStore, EventType } from "../src";
 
 describe("createStore", function() {
   type State = {
@@ -517,7 +517,7 @@ describe("createStore", function() {
       get(path());
       const receivedInitEvent = subscriber.mock.calls[0][0];
       const expectedInitEvent = {
-        type: "INIT",
+        type: EventType.Init,
         state: initialState
       };
 
@@ -531,7 +531,7 @@ describe("createStore", function() {
       get(path());
       const receivedGetEvent = subscriber.mock.calls[1][0];
       const expectedInitEvent = {
-        type: "GET",
+        type: EventType.Get,
         path: [],
         value: initialState,
         meta: null
@@ -547,7 +547,7 @@ describe("createStore", function() {
       get(path(), testMeta);
       const receivedGetEvent = subscriber.mock.calls[1][0];
       const expectedInitEvent = {
-        type: "GET",
+        type: EventType.Get,
         path: [],
         value: initialState,
         meta: testMeta
@@ -563,7 +563,7 @@ describe("createStore", function() {
       set(path(), fullInitialState);
       const receivedSetEvent = subscriber.mock.calls[1][0];
       const expectedSetEvent = {
-        type: "SET",
+        type: EventType.Set,
         path: [],
         prevValue: initialState,
         value: fullInitialState,
@@ -580,7 +580,7 @@ describe("createStore", function() {
       set(path(), fullInitialState, testMeta);
       const receivedSetEvent = subscriber.mock.calls[1][0];
       const expectedSetEvent = {
-        type: "SET",
+        type: EventType.Set,
         path: [],
         prevValue: initialState,
         value: fullInitialState,
@@ -597,7 +597,7 @@ describe("createStore", function() {
       update(path(), () => fullInitialState);
       const receivedUpdateEvent = subscriber.mock.calls[1][0];
       const expectedUpdateEvent = {
-        type: "UPDATE",
+        type: EventType.Update,
         path: [],
         prevValue: initialState,
         value: fullInitialState,
@@ -614,7 +614,7 @@ describe("createStore", function() {
       update(path(), () => fullInitialState, testMeta);
       const receivedUpdateEvent = subscriber.mock.calls[1][0];
       const expectedUpdateEvent = {
-        type: "UPDATE",
+        type: EventType.Update,
         path: [],
         prevValue: initialState,
         value: fullInitialState,
@@ -631,7 +631,7 @@ describe("createStore", function() {
       remove(path("e", "bob"));
       const receivedRemoveEvent = subscriber.mock.calls[1][0];
       const expectedRemoveEvent = {
-        type: "REMOVE",
+        type: EventType.Remove,
         path: ["e", "bob"],
         prevValue: "cool",
         meta: null
@@ -647,7 +647,7 @@ describe("createStore", function() {
       remove(path("e", "bob"), testMeta);
       const receivedRemoveEvent = subscriber.mock.calls[1][0];
       const expectedRemoveEvent = {
-        type: "REMOVE",
+        type: EventType.Remove,
         path: ["e", "bob"],
         prevValue: "cool",
         meta: testMeta
@@ -684,16 +684,27 @@ describe("createStore", function() {
         meta: null,
         type: "TRANSACTION",
         events: [
-          { type: "GET", path: ["d"], value: [0, 1, 2], meta: null },
-          { type: "SET", path: ["a"], prevValue: "a", value: "aa", meta: null },
+          { type: EventType.Get, path: ["d"], value: [0, 1, 2], meta: null },
           {
-            type: "UPDATE",
+            type: EventType.Set,
+            path: ["a"],
+            prevValue: "a",
+            value: "aa",
+            meta: null
+          },
+          {
+            type: EventType.Update,
             path: ["d"],
             prevValue: [0, 1, 2],
             value: [0, 1, 2, 3],
             meta: null
           },
-          { type: "REMOVE", path: ["e", "bob"], prevValue: "cool", meta: null }
+          {
+            type: EventType.Remove,
+            path: ["e", "bob"],
+            prevValue: "cool",
+            meta: null
+          }
         ]
       };
 
@@ -727,16 +738,27 @@ describe("createStore", function() {
       const expectedTransactionEvent = {
         type: "TRANSACTION",
         events: [
-          { type: "GET", path: ["d"], value: [0, 1, 2], meta: null },
-          { type: "SET", path: ["a"], prevValue: "a", value: "aa", meta: null },
+          { type: EventType.Get, path: ["d"], value: [0, 1, 2], meta: null },
           {
-            type: "UPDATE",
+            type: EventType.Set,
+            path: ["a"],
+            prevValue: "a",
+            value: "aa",
+            meta: null
+          },
+          {
+            type: EventType.Update,
             path: ["d"],
             prevValue: [0, 1, 2],
             value: [0, 1, 2, 3],
             meta: null
           },
-          { type: "REMOVE", path: ["e", "bob"], prevValue: "cool", meta: null }
+          {
+            type: EventType.Remove,
+            path: ["e", "bob"],
+            prevValue: "cool",
+            meta: null
+          }
         ],
         meta: testMeta
       };

@@ -3,6 +3,7 @@ import typescript from "rollup-plugin-typescript2";
 
 import pkg from "./package.json";
 
+// eslint-disable-next-line no-restricted-syntax
 export default {
   input: `src/index.ts`,
   output: [

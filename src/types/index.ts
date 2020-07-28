@@ -171,6 +171,10 @@ export type Path<S extends StoreValue> = _PathFor<S, StoreValue>;
 /**
  * `PathFactory` makes it easy to construct and compose paths
  *
+ * @remarks
+ * The order of the overloads is significant. The key only overloads come before
+ * the path extension overloads for maximum completion support.
+ *
  * @typeParam S - the state tree
  */
 export type PathFactory<S extends StoreValue> = {
@@ -179,12 +183,12 @@ export type PathFactory<S extends StoreValue> = {
   <K1 extends ContainerKey<S>>(key1: K1): [K1];
 
   <K1 extends ContainerKey<S>, K2 extends ContainerKey<S[K1]>>(
-    path: [K1],
+    key1: K1,
     key2: K2
   ): [K1, K2];
 
   <K1 extends ContainerKey<S>, K2 extends ContainerKey<S[K1]>>(
-    key1: K1,
+    path: [K1],
     key2: K2
   ): [K1, K2];
 
@@ -193,6 +197,16 @@ export type PathFactory<S extends StoreValue> = {
     K2 extends ContainerKey<S[K1]>,
     K3 extends ContainerKey<S[K1][K2]>
   >(
+    key1: K1,
+    key2: K2,
+    key3: K3
+  ): [K1, K2, K3];
+
+  <
+    K1 extends ContainerKey<S>,
+    K2 extends ContainerKey<S[K1]>,
+    K3 extends ContainerKey<S[K1][K2]>
+  >(
     path: [K1],
     key2: K2,
     key3: K3
@@ -210,12 +224,14 @@ export type PathFactory<S extends StoreValue> = {
   <
     K1 extends ContainerKey<S>,
     K2 extends ContainerKey<S[K1]>,
-    K3 extends ContainerKey<S[K1][K2]>
+    K3 extends ContainerKey<S[K1][K2]>,
+    K4 extends ContainerKey<S[K1][K2][K3]>
   >(
     key1: K1,
     key2: K2,
-    key3: K3
-  ): [K1, K2, K3];
+    key3: K3,
+    key4: K4
+  ): [K1, K2, K3, K4];
 
   <
     K1 extends ContainerKey<S>,
@@ -254,13 +270,15 @@ export type PathFactory<S extends StoreValue> = {
     K1 extends ContainerKey<S>,
     K2 extends ContainerKey<S[K1]>,
     K3 extends ContainerKey<S[K1][K2]>,
-    K4 extends ContainerKey<S[K1][K2][K3]>
+    K4 extends ContainerKey<S[K1][K2][K3]>,
+    K5 extends ContainerKey<S[K1][K2][K3][K4]>
   >(
     key1: K1,
     key2: K2,
     key3: K3,
-    key4: K4
-  ): [K1, K2, K3, K4];
+    key4: K4,
+    key5: K5
+  ): [K1, K2, K3, K4, K5];
 
   <
     K1 extends ContainerKey<S>,
@@ -300,6 +318,7 @@ export type PathFactory<S extends StoreValue> = {
     key4: K4,
     key5: K5
   ): [K1, K2, K3, K4, K5];
+
   <
     K1 extends ContainerKey<S>,
     K2 extends ContainerKey<S[K1]>,
@@ -308,20 +327,6 @@ export type PathFactory<S extends StoreValue> = {
     K5 extends ContainerKey<S[K1][K2][K3][K4]>
   >(
     path: [K1, K2, K3, K4],
-    key5: K5
-  ): [K1, K2, K3, K4, K5];
-
-  <
-    K1 extends ContainerKey<S>,
-    K2 extends ContainerKey<S[K1]>,
-    K3 extends ContainerKey<S[K1][K2]>,
-    K4 extends ContainerKey<S[K1][K2][K3]>,
-    K5 extends ContainerKey<S[K1][K2][K3][K4]>
-  >(
-    key1: K1,
-    key2: K2,
-    key3: K3,
-    key4: K4,
     key5: K5
   ): [K1, K2, K3, K4, K5];
 
@@ -462,6 +467,15 @@ export type ReadManager<S extends StoreValue> = {
   ): Value<S, P, V>;
 };
 
+export enum EventType {
+  Init = "Init",
+  Get = "GET",
+  Set = "SET",
+  Update = "UPDATE",
+  Remove = "REMOVE",
+  Transaction = "TRANSACTION"
+}
+
 /**
  * `Updater`s specify an update to a value in the store.
  *
@@ -483,7 +497,7 @@ export type Updater<T> = (value: T) => T | void;
  * @typeParam S - the state tree
  */
 export type InitEvent<S extends StoreValue> = {
-  type: "INIT";
+  type: EventType.Init;
   state: S;
 };
 
@@ -494,7 +508,7 @@ export type InitEvent<S extends StoreValue> = {
  * `GetEvent` is completely frozen (i.e. immutable).
  */
 export type GetEvent<S extends StoreValue> = {
-  type: "GET";
+  type: EventType.Get;
   path: Path<S>;
   value: StoreValue;
   meta: StoreRecord | null;
@@ -507,7 +521,7 @@ export type GetEvent<S extends StoreValue> = {
  * `SetEvent` is completely frozen (i.e. immutable).
  */
 export type SetEvent<S extends StoreValue> = {
-  type: "SET";
+  type: EventType.Set;
   path: Path<S>;
   prevValue: StoreValue;
   value: StoreValue;
@@ -521,7 +535,7 @@ export type SetEvent<S extends StoreValue> = {
  * `UpdateEvent` is completely frozen (i.e. immutable).
  */
 export type UpdateEvent<S extends StoreValue> = {
-  type: "UPDATE";
+  type: EventType.Update;
   path: Path<S>;
   prevValue: StoreValue;
   value: StoreValue;
@@ -535,7 +549,7 @@ export type UpdateEvent<S extends StoreValue> = {
  * `RemoveEvent` is completely frozen (i.e. immutable).
  */
 export type RemoveEvent<S extends StoreValue> = {
-  type: "REMOVE";
+  type: EventType.Remove;
   path: Path<S>;
   prevValue: StoreValue;
   meta: StoreRecord | null;
@@ -567,7 +581,7 @@ export type CRUDEvent<S extends StoreValue> = GetEvent<S> | WriteEvent<S>;
  * `TransactionEvent` is completely frozen (i.e. immutable).
  */
 export type TransactionEvent<S extends StoreValue> = {
-  type: "TRANSACTION";
+  type: EventType.Transaction;
   events: Array<CRUDEvent<S>>;
   meta: StoreRecord | null;
 };

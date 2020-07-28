@@ -1,10 +1,10 @@
-import deepFreeze from "./utils/deepFreeze";
-import clone from "./utils/clone";
-import createReadManager from "./utils/createReadManager";
-import getByPath from "./utils/getByPath";
-import getContainer from "./utils/getContainer";
-import createPathFactory from "./utils/createPathFactory";
-import computePathLineage from "./utils/computePathLineage";
+import { deepFreeze } from "./utils/deepFreeze";
+import { clone } from "./utils/clone";
+import { createReadManager } from "./utils/createReadManager";
+import { getByPath } from "./utils/getByPath";
+import { getContainer } from "./utils/getContainer";
+import { createPathFactory } from "./utils/createPathFactory";
+import { computePathLineage } from "./utils/computePathLineage";
 import {
   StoreRecord,
   StoreValue,
@@ -12,6 +12,7 @@ import {
   Path,
   Value,
   Updater,
+  EventType,
   InitEvent,
   GetEvent,
   SetEvent,
@@ -24,16 +25,8 @@ import {
   Store
 } from "./types";
 
-// create constants to optimize memory allocation
-const GET = "GET";
-const SET = "SET";
-const UPDATE = "UPDATE";
-const REMOVE = "REMOVE";
-const TRANSACTION = "TRANSACTION";
-
 function createInitEvent<S extends StoreValue>(state: S): InitEvent<S> {
-  // use a literal because createInitEvent is only called once
-  return deepFreeze({ state, type: "INIT" });
+  return deepFreeze({ state, type: EventType.Init });
 }
 
 function createGetEvent<S extends StoreValue>(
@@ -41,7 +34,7 @@ function createGetEvent<S extends StoreValue>(
   value: StoreValue,
   meta: StoreRecord | null
 ): GetEvent<S> {
-  return deepFreeze({ path, value, meta, type: GET });
+  return deepFreeze({ path, value, meta, type: EventType.Get });
 }
 
 function createSetEvent<S extends StoreValue>(
@@ -55,7 +48,7 @@ function createSetEvent<S extends StoreValue>(
     value,
     path,
     meta,
-    type: SET
+    type: EventType.Set
   });
 }
 
@@ -70,7 +63,7 @@ function createUpdateEvent<S extends StoreValue>(
     prevValue,
     value,
     meta,
-    type: UPDATE
+    type: EventType.Update
   });
 }
 
@@ -83,7 +76,7 @@ function createRemoveEvent<S extends StoreValue>(
     path,
     prevValue,
     meta,
-    type: REMOVE
+    type: EventType.Remove
   });
 }
 
@@ -93,7 +86,7 @@ function createTransactionEvent<S extends StoreValue>(
 ): TransactionEvent<S> {
   return deepFreeze({
     meta,
-    type: TRANSACTION,
+    type: EventType.Transaction,
     events: transactionEvents
   });
 }
@@ -103,9 +96,7 @@ function createTransactionEvent<S extends StoreValue>(
  *
  * @typeParam S - the state tree;
  */
-export default function createStore<S extends StoreValue>(
-  initialState: S
-): Store<S> {
+export function createStore<S extends StoreValue>(initialState: S): Store<S> {
   let initialized = false;
   let state: S = clone(initialState);
   let transactionWrites: Array<() => void> = [];

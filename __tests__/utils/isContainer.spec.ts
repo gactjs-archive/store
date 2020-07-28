@@ -1,4 +1,4 @@
-import isContainer from "../../src/utils/isContainer";
+import { isContainer } from "../../src/utils/isContainer";
 
 describe("isContainer", function() {
   test("plain objects are containers", function() {

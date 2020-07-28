@@ -1,4 +1,4 @@
-import clone from "../../src/utils/clone";
+import { clone } from "../../src/utils/clone";
 
 describe("clone", function() {
   test("clone string", function() {

@@ -1,8 +1,6 @@
-export { default as createStore } from "./createStore";
+export { createStore } from "./createStore";
+export { computePathLineage } from "./utils/computePathLineage";
 
-export { default as computePathLineage } from "./utils/computePathLineage";
-
-// types
 export {
   Primitive,
   StoreRecord,
@@ -17,6 +15,7 @@ export {
   ValueAt,
   Value,
   Updater,
+  EventType,
   InitEvent,
   GetEvent,
   SetEvent,

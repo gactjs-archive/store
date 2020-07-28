@@ -1,4 +1,4 @@
-import isStoreRecord from "../../src/utils/isStoreRecord";
+import { isStoreRecord } from "../../src/utils/isStoreRecord";
 
 describe("isStoreRecord", function() {
   test("Plain objects are records ", function() {

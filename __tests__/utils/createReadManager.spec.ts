@@ -1,4 +1,4 @@
-import createReadManager from "../../src/utils/createReadManager";
+import { createReadManager } from "../../src/utils/createReadManager";
 
 describe("createReadManager", function() {
   type State = {

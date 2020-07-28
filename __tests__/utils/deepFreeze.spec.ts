@@ -1,4 +1,4 @@
-import deepFreeze from "../../src/utils/deepFreeze";
+import { deepFreeze } from "../../src/utils/deepFreeze";
 
 describe("deepFreeze", function() {
   test("array", function() {

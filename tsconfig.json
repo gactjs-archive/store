@@ -7,7 +7,7 @@
     "strict": true,
     "sourceMap": true,
     "declaration": true,
-    "keyofStringsOnly": true,
+    "keyofStringsOnly": true, // Used to circumvent: "Type instantiation is excessively deep and possibly infinite".
     "downlevelIteration": true,
     "esModuleInterop": true,
     "declarationDir": "dist/types",

@@ -1,4 +1,4 @@
-import getByPath from "./getByPath";
+import { getByPath } from "./getByPath";
 import { StoreValue, Container, Path, PathFor } from "../types";
 
 /**
@@ -9,7 +9,7 @@ import { StoreValue, Container, Path, PathFor } from "../types";
  * @typeParam V - the value in S at P
  *
  */
-export default function getContainer<
+export function getContainer<
   S extends StoreValue,
   P extends Path<S>,
   V extends StoreValue

@@ -1,4 +1,4 @@
-import createPathFactory from "../../src/utils/createPathFactory";
+import { createPathFactory } from "../../src/utils/createPathFactory";
 
 describe("createPathFactory", function() {
   type State = {

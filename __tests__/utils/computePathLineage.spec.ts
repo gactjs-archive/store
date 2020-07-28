@@ -1,4 +1,4 @@
-import computePathLineage from "../../src/utils/computePathLineage";
+import { computePathLineage } from "../../src/utils/computePathLineage";
 
 describe("computePathLineage", function() {
   test("handles a scalar state", function() {

@@ -1,4 +1,4 @@
-import isPrimitive from "../../src/utils/isPrimitive";
+import { isPrimitive } from "../../src/utils/isPrimitive";
 
 describe("isPrimitive", function() {
   test("string is a Primitive", function() {

@@ -1,4 +1,4 @@
-import isBlob from "../../src/utils/isBlob";
+import { isBlob } from "../../src/utils/isBlob";
 
 describe("isBlob", function() {
   test("Blob is a Blob", function() {

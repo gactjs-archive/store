@@ -1,9 +1,8 @@
-import isPrimitive from "./isPrimitive";
-import cloneComplex from "./cloneComplex";
-import warning from "./warning";
-
+import { isPrimitive } from "./isPrimitive";
+import { isContainer } from "./isContainer";
+import { cloneComplex } from "./cloneComplex";
+import { warning } from "./warning";
 import { StoreValue, Complex } from "../types";
-import isContainer from "./isContainer";
 
 function cloneHelper<T extends StoreValue>(
   value: T,
@@ -72,7 +71,7 @@ function cloneHelper<T extends StoreValue>(
  *
  * @typeParam T - the value being cloned
  */
-export default function clone<T extends StoreValue>(value: T): T {
+export function clone<T extends StoreValue>(value: T): T {
   const clonedValues: Set<StoreValue> = new Set();
 
   return cloneHelper(value, clonedValues);

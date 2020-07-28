@@ -1,4 +1,4 @@
-import isFile from "../../src/utils/isFile";
+import { isFile } from "../../src/utils/isFile";
 
 describe("isFile", function() {
   test("File is a File", function() {
