@@ -1,5 +1,6 @@
 export { createStore } from "./createStore";
 export { computePathLineage } from "./utils/computePathLineage";
+export * from "./utils/eventTypeGuards";
 
 export {
   Primitive,

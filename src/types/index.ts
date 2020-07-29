@@ -80,32 +80,30 @@ export type StoreValue = Primitive | Complex;
  * `ContainerKey` is the building block of paths.
  *
  * @remarks
- * `ContainerKey` excludes the built-in properties of `StoreValue`s to ensure
- * that we only recognize user-defined properties.
- *
  * In order to circumvent {@link https://github.com/microsoft/TypeScript/issues/31619 | type instantiation limits} `ContainerKey`
  * is not defined as:
  * ```ts
  * type ContainerKey<S> = S extends Container
  * ? Exclude<keyof S, Exclude<keyof [], number>>
  * : never;
+ *
+ * The definition we use unfortunately recognizes built-in properties. We exclude a selected list of built-in properties
+ * to reduce this leakage. However, we cannot exclude all built-in properties because that would make it impossible to
+ * use those same property names elsewhere (e.g. a StoreRecord couldn't have a property "search" because that's a built-in method
+ * on strings).
  * ```
  */
 export type ContainerKey<S> = Exclude<
   keyof S,
-  Exclude<
-    | keyof number
-    | keyof bigint
-    | keyof boolean
-    | keyof Blob
-    | keyof File
-    | keyof string
-    | keyof [],
-    number
-  >
+  | "toString"
+  | "toFixed"
+  | "toExponential"
+  | "toPrecision"
+  | "valueOf"
+  | "toLocaleString"
 >;
 
-export type _PathFor<S extends StoreValue, V> =
+export type _PathFor<S extends StoreValue, V extends StoreValue> =
   | MatchThen<S, V, []>
   | ValueOf<
       {
@@ -417,7 +415,7 @@ export type ValueAt<S extends StoreValue, P extends Path<S>> = P extends
   | [infer K1, infer K2, infer K3]
   | [infer K1, infer K2, infer K3, infer K4]
   | [infer K1, infer K2, infer K3, infer K4, infer K5]
-  | [infer K1, infer K2, infer K3, infer K4, infer K5, infer K6]
+  | [infer K1, infer K2, infer K3, infer K4, infer K5]
   ? K1 extends ContainerKey<S>
     ? K2 extends ContainerKey<S[K1]>
       ? K3 extends ContainerKey<S[K1][K2]>
@@ -468,7 +466,7 @@ export type ReadManager<S extends StoreValue> = {
 };
 
 export enum EventType {
-  Init = "Init",
+  Init = "INIT",
   Get = "GET",
   Set = "SET",
   Update = "UPDATE",
