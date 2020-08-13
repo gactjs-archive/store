@@ -1,11 +1,10 @@
-import { isStoreRecord } from "./isStoreRecord";
-import { isBlob } from "./isBlob";
-import { isFile } from "./isFile";
+import { Complex } from "../types";
 import { cloneArray } from "./cloneArray";
 import { cloneBlob } from "./cloneBlob";
 import { cloneFile } from "./cloneFile";
-
-import { Complex } from "../types";
+import { isBlob } from "./isBlob";
+import { isFile } from "./isFile";
+import { isStoreRecord } from "./isStoreRecord";
 
 export function cloneComplex<T extends Complex>(value: T): T {
   let result;

@@ -68,7 +68,7 @@ describe("createStore", function() {
         d[0] = 1;
       }).toThrow();
 
-      const e = get(path("e"));
+      const e = get<Record<string, string>>(path("e"));
       expect(function() {
         e.bob = "not cool";
       }).toThrow();
@@ -98,17 +98,17 @@ describe("createStore", function() {
     test("scalar", function() {
       const { path, get, set } = createStore(initialState);
 
-      set(path("a"), "b");
+      set<string>(path("a"), "b");
       expect(get(path("a"))).toBe("b");
     });
 
     test("deep scalar", function() {
       const { path, get, set } = createStore(initialState);
 
-      set(path("d", 0), 1);
+      set<number>(path("d", 0), 1);
       expect(get(path("d", 0))).toBe(1);
 
-      set(path("b", "c"), BigInt(1000));
+      set<bigint>(path("b", "c"), BigInt(1000));
       expect(get(path("b", "c"))).toBe(BigInt(1000));
     });
 
@@ -129,7 +129,7 @@ describe("createStore", function() {
     test("trying to set with a path not from store.path throws", function() {
       const { set } = createStore(initialState);
       expect(function() {
-        set(["a"], "b");
+        set<string>(["a"], "b");
       }).toThrow();
     });
   });
@@ -153,7 +153,7 @@ describe("createStore", function() {
       const newD = [0, 1, 2];
       const newE = { bob: "cool", jane: "cool" };
 
-      update(path(), function(newState) {
+      update<State>(path(), function(newState) {
         newState.a = newA;
         newState.b = newB;
         newState.d = newD;
@@ -176,13 +176,13 @@ describe("createStore", function() {
     test("deep", function() {
       const { path, get, update } = createStore(initialState);
 
-      update(path("b", "c"), d => d + BigInt(1000));
+      update<bigint>(path("b", "c"), d => d + BigInt(1000));
       expect(get(path("b", "c"))).toBe(BigInt(1000));
     });
 
     test("updates through mutation work", function() {
       const { path, get, update } = createStore(initialState);
-      update(path("d"), function(d) {
+      update<Array<number>>(path("d"), function(d) {
         d.push(0);
       });
 
@@ -193,7 +193,7 @@ describe("createStore", function() {
       const { path, get, update } = createStore(initialState);
       const oldD = get(path("d"));
       let newD: Array<number> = [];
-      update(path("d"), function(d) {
+      update<Array<number>>(path("d"), function(d) {
         newD = d;
       });
 
@@ -230,7 +230,7 @@ describe("createStore", function() {
       const { path, update } = createStore(initialState);
 
       expect(function() {
-        update(path("d", 0), n => n + 1000);
+        update<number>(path("d", 0), n => n + 1000);
       }).toThrowError("does not exist");
     });
 
@@ -276,9 +276,9 @@ describe("createStore", function() {
       );
 
       transaction(function() {
-        set(path("a"), "aa");
+        set<string>(path("a"), "aa");
 
-        update(path("d"), function(d) {
+        update<Array<number>>(path("d"), function(d) {
           d.push(3);
         });
 
@@ -299,7 +299,7 @@ describe("createStore", function() {
         set(path("b", "c"), BigInt(1));
         // this will only be true if the previous set is not handled atomically
         if (get(path("b", "c"))) {
-          update(path("b", "c"), c => c + BigInt(1));
+          update<bigint>(path("b", "c"), c => c + BigInt(1));
         }
       });
 
@@ -517,8 +517,8 @@ describe("createStore", function() {
       get(path());
       const receivedInitEvent = subscriber.mock.calls[0][0];
       const expectedInitEvent = {
-        type: EventType.Init,
-        state: initialState
+        state: initialState,
+        type: EventType.Init
       };
 
       expect(receivedInitEvent).toStrictEqual(expectedInitEvent);
@@ -531,10 +531,10 @@ describe("createStore", function() {
       get(path());
       const receivedGetEvent = subscriber.mock.calls[1][0];
       const expectedInitEvent = {
-        type: EventType.Get,
+        meta: null,
         path: [],
-        value: initialState,
-        meta: null
+        type: EventType.Get,
+        value: initialState
       };
 
       expect(receivedGetEvent).toStrictEqual(expectedInitEvent);
@@ -547,10 +547,10 @@ describe("createStore", function() {
       get(path(), testMeta);
       const receivedGetEvent = subscriber.mock.calls[1][0];
       const expectedInitEvent = {
-        type: EventType.Get,
+        meta: testMeta,
         path: [],
-        value: initialState,
-        meta: testMeta
+        type: EventType.Get,
+        value: initialState
       };
 
       expect(receivedGetEvent).toStrictEqual(expectedInitEvent);
@@ -563,11 +563,11 @@ describe("createStore", function() {
       set(path(), fullInitialState);
       const receivedSetEvent = subscriber.mock.calls[1][0];
       const expectedSetEvent = {
-        type: EventType.Set,
+        meta: null,
         path: [],
         prevValue: initialState,
-        value: fullInitialState,
-        meta: null
+        type: EventType.Set,
+        value: fullInitialState
       };
 
       expect(receivedSetEvent).toStrictEqual(expectedSetEvent);
@@ -580,11 +580,11 @@ describe("createStore", function() {
       set(path(), fullInitialState, testMeta);
       const receivedSetEvent = subscriber.mock.calls[1][0];
       const expectedSetEvent = {
-        type: EventType.Set,
+        meta: testMeta,
         path: [],
         prevValue: initialState,
-        value: fullInitialState,
-        meta: testMeta
+        type: EventType.Set,
+        value: fullInitialState
       };
 
       expect(receivedSetEvent).toStrictEqual(expectedSetEvent);
@@ -597,11 +597,11 @@ describe("createStore", function() {
       update(path(), () => fullInitialState);
       const receivedUpdateEvent = subscriber.mock.calls[1][0];
       const expectedUpdateEvent = {
-        type: EventType.Update,
+        meta: null,
         path: [],
         prevValue: initialState,
-        value: fullInitialState,
-        meta: null
+        type: EventType.Update,
+        value: fullInitialState
       };
 
       expect(receivedUpdateEvent).toStrictEqual(expectedUpdateEvent);
@@ -614,11 +614,11 @@ describe("createStore", function() {
       update(path(), () => fullInitialState, testMeta);
       const receivedUpdateEvent = subscriber.mock.calls[1][0];
       const expectedUpdateEvent = {
-        type: EventType.Update,
+        meta: testMeta,
         path: [],
         prevValue: initialState,
-        value: fullInitialState,
-        meta: testMeta
+        type: EventType.Update,
+        value: fullInitialState
       };
 
       expect(receivedUpdateEvent).toStrictEqual(expectedUpdateEvent);
@@ -631,10 +631,10 @@ describe("createStore", function() {
       remove(path("e", "bob"));
       const receivedRemoveEvent = subscriber.mock.calls[1][0];
       const expectedRemoveEvent = {
-        type: EventType.Remove,
+        meta: null,
         path: ["e", "bob"],
         prevValue: "cool",
-        meta: null
+        type: EventType.Remove
       };
 
       expect(receivedRemoveEvent).toStrictEqual(expectedRemoveEvent);
@@ -647,10 +647,10 @@ describe("createStore", function() {
       remove(path("e", "bob"), testMeta);
       const receivedRemoveEvent = subscriber.mock.calls[1][0];
       const expectedRemoveEvent = {
-        type: EventType.Remove,
+        meta: testMeta,
         path: ["e", "bob"],
         prevValue: "cool",
-        meta: testMeta
+        type: EventType.Remove
       };
 
       expect(receivedRemoveEvent).toStrictEqual(expectedRemoveEvent);
@@ -669,43 +669,43 @@ describe("createStore", function() {
       const subscriber = jest.fn();
       subscribe(subscriber);
       transaction(function() {
-        set(path("a"), "aa");
+        set<string>(path("a"), "aa");
 
-        update(path("d"), function(b) {
+        update<Array<number>>(path("d"), function(b) {
           b.push(3);
         });
 
-        if (get(path("d")).length > 1) {
+        if (get<Array<number>>(path("d")).length > 1) {
           remove(path("e", "bob"));
         }
       });
       const receivedTransactionEvent = subscriber.mock.calls[1][0];
       const expectedTransactionEvent = {
-        meta: null,
-        type: "TRANSACTION",
         events: [
-          { type: EventType.Get, path: ["d"], value: [0, 1, 2], meta: null },
+          { meta: null, path: ["d"], type: EventType.Get, value: [0, 1, 2] },
           {
-            type: EventType.Set,
+            meta: null,
             path: ["a"],
             prevValue: "a",
-            value: "aa",
-            meta: null
+            type: EventType.Set,
+            value: "aa"
           },
           {
-            type: EventType.Update,
+            meta: null,
             path: ["d"],
             prevValue: [0, 1, 2],
-            value: [0, 1, 2, 3],
-            meta: null
+            type: EventType.Update,
+            value: [0, 1, 2, 3]
           },
           {
-            type: EventType.Remove,
+            meta: null,
             path: ["e", "bob"],
             prevValue: "cool",
-            meta: null
+            type: EventType.Remove
           }
-        ]
+        ],
+        meta: null,
+        type: "TRANSACTION"
       };
 
       expect(receivedTransactionEvent).toStrictEqual(expectedTransactionEvent);
@@ -724,43 +724,43 @@ describe("createStore", function() {
       const subscriber = jest.fn();
       subscribe(subscriber);
       transaction(function() {
-        set(path("a"), "aa");
+        set<string>(path("a"), "aa");
 
-        update(path("d"), function(b) {
+        update<Array<number>>(path("d"), function(b) {
           b.push(3);
         });
 
-        if (get(path("d")).length > 1) {
+        if (get<Array<number>>(path("d")).length > 1) {
           remove(path("e", "bob"));
         }
       }, testMeta);
       const receivedTransactionEvent = subscriber.mock.calls[1][0];
       const expectedTransactionEvent = {
-        type: "TRANSACTION",
         events: [
-          { type: EventType.Get, path: ["d"], value: [0, 1, 2], meta: null },
+          { meta: null, path: ["d"], type: EventType.Get, value: [0, 1, 2] },
           {
-            type: EventType.Set,
+            meta: null,
             path: ["a"],
             prevValue: "a",
-            value: "aa",
-            meta: null
+            type: EventType.Set,
+            value: "aa"
           },
           {
-            type: EventType.Update,
+            meta: null,
             path: ["d"],
             prevValue: [0, 1, 2],
-            value: [0, 1, 2, 3],
-            meta: null
+            type: EventType.Update,
+            value: [0, 1, 2, 3]
           },
           {
-            type: EventType.Remove,
+            meta: null,
             path: ["e", "bob"],
             prevValue: "cool",
-            meta: null
+            type: EventType.Remove
           }
         ],
-        meta: testMeta
+        meta: testMeta,
+        type: "TRANSACTION"
       };
 
       expect(receivedTransactionEvent).toStrictEqual(expectedTransactionEvent);

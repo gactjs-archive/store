@@ -1,31 +1,28 @@
 export { createStore } from "./createStore";
-export { computePathLineage } from "./utils/computePathLineage";
-export * from "./utils/eventTypeGuards";
-
 export {
-  Primitive,
-  StoreRecord,
-  StoreArray,
-  Container,
   Complex,
-  StoreValue,
+  Container,
   ContainerKey,
-  PathFor,
+  CRUDEvent,
+  EventType,
+  GetEvent,
+  InitEvent,
+  Listener,
   Path,
   PathFactory,
-  ValueAt,
-  Value,
-  Updater,
-  EventType,
-  InitEvent,
-  GetEvent,
-  SetEvent,
-  UpdateEvent,
+  PathFor,
+  Primitive,
   RemoveEvent,
-  WriteEvent,
-  CRUDEvent,
-  TransactionEvent,
+  SetEvent,
+  Store,
+  StoreArray,
   StoreEvent,
-  Listener,
-  Store
+  StoreRecord,
+  StoreValue,
+  TransactionEvent,
+  UpdateEvent,
+  Updater,
+  WriteEvent
 } from "./types";
+export { computePathLineage } from "./utils/computePathLineage";
+export * from "./utils/eventTypeGuards";

@@ -1,11 +1,9 @@
+import { Path, PathFor, StoreValue } from "../types";
 import { isContainer } from "./isContainer";
-import { StoreValue, PathFor, Path, ValueAt, Value } from "../types";
 
-function computeAncestorPaths<
-  S extends StoreValue,
-  P extends Path<S>,
-  V extends StoreValue
->(path: P | PathFor<S, V>): Set<Path<S>> {
+function computeAncestorPaths<S extends StoreValue, V extends StoreValue>(
+  path: PathFor<S, V>
+): Set<Path<S>> {
   const ancestorPaths: Set<Path<S>> = new Set();
   for (let i = 0; i < path.length; i++) {
     ancestorPaths.add(path.slice(0, i) as Path<S>);
@@ -13,11 +11,10 @@ function computeAncestorPaths<
   return ancestorPaths;
 }
 
-function computeDescendantPaths<
-  S extends StoreValue,
-  P extends Path<S>,
-  V extends StoreValue
->(path: P | PathFor<S, V>, value: Value<S, P, V>): Set<Path<S>> {
+function computeDescendantPaths<S extends StoreValue, V extends StoreValue>(
+  path: PathFor<S, V>,
+  value: V | null
+): Set<Path<S>> {
   // only containers have descendant paths
   if (!isContainer(value)) {
     return new Set();
@@ -30,7 +27,7 @@ function computeDescendantPaths<
     descendantPaths.add(childPath);
     for (const descendantPath of computeDescendantPaths(
       childPath,
-      childValue as ValueAt<S, Path<S>>
+      childValue
     )) {
       descendantPaths.add(descendantPath);
     }
@@ -46,14 +43,13 @@ function computeDescendantPaths<
  * @typeParam P - the path
  * @typeParam V - the value in S at P
  */
-export function computePathLineage<
-  S extends StoreValue,
-  P extends Path<S>,
-  V extends StoreValue
->(path: P | PathFor<S, V>, value: Value<S, P, V>): Set<Path<S>> {
+export function computePathLineage<S extends StoreValue, V extends StoreValue>(
+  path: PathFor<S, V>,
+  value: V | null
+): Set<Path<S>> {
   return new Set([
     ...computeAncestorPaths(path),
-    path as Path<S>,
+    (path as unknown) as Path<S>,
     ...computeDescendantPaths(path, value)
   ]);
 }

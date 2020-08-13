@@ -84,8 +84,8 @@ describe("clone", function() {
 
   test("clone record", function() {
     const value = {
-      love: 100,
-      hate: false
+      hate: false,
+      love: 100
     };
     const valueClone = clone(value);
     expect(value).not.toBe(valueClone);
@@ -96,8 +96,8 @@ describe("clone", function() {
     const value = {
       name: "Bob",
       school: {
-        name: "Do U",
-        graduation: 1899
+        graduation: 1899,
+        name: "Do U"
       }
     };
     const valueClone = clone(value);
@@ -110,9 +110,9 @@ describe("clone", function() {
   test("ensures properties have the default descriptor", function() {
     const value = {};
     Object.defineProperty(value, "truth", {
-      value: 100,
       configurable: false,
       enumerable: false,
+      value: 100,
       writable: false
     });
     expect(function() {

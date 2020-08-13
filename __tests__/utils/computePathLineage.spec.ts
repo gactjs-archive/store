@@ -1,9 +1,9 @@
-import { computePathLineage } from "../../src/utils/computePathLineage";
+import { computePathLineage } from "../../src";
 
 describe("computePathLineage", function() {
   test("handles a scalar state", function() {
     const expectedPathFamily = new Set([[]]);
-    expect(computePathLineage<number, [], number>([], 100)).toEqual(
+    expect(computePathLineage<number, number>([], 100)).toEqual(
       expectedPathFamily
     );
   });
@@ -24,9 +24,9 @@ describe("computePathLineage", function() {
       ["a", "b", "c"]
     ]);
 
-    expect(
-      computePathLineage<State, ["a", "b", "c"], number>(["a", "b", "c"], 100)
-    ).toEqual(expectedPathFamily);
+    expect(computePathLineage<State, number>(["a", "b", "c"], 100)).toEqual(
+      expectedPathFamily
+    );
   });
 
   test("compute descendant paths of a complex tree", function() {
@@ -56,7 +56,7 @@ describe("computePathLineage", function() {
       ["d"]
     ]);
 
-    expect(computePathLineage<State, [], State>([], state)).toEqual(
+    expect(computePathLineage<State, State>([], state)).toEqual(
       expectedPathFamily
     );
   });
@@ -91,8 +91,8 @@ describe("computePathLineage", function() {
       ["a", "b", "c", "g"]
     ]);
 
-    expect(
-      computePathLineage<State, ["a", "b", "c"], C>(["a", "b", "c"], value)
-    ).toEqual(expectedPathFamily);
+    expect(computePathLineage<State, C>(["a", "b", "c"], value)).toEqual(
+      expectedPathFamily
+    );
   });
 });

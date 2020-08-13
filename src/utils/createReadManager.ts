@@ -1,14 +1,7 @@
-import { isPrimitive } from "./isPrimitive";
-import { isContainer } from "./isContainer";
+import { Complex, Path, PathFor, ReadManager, StoreValue } from "../types";
 import { cloneComplex } from "./cloneComplex";
-import {
-  StoreValue,
-  Complex,
-  Path,
-  PathFor,
-  Value,
-  ReadManager
-} from "../types";
+import { isContainer } from "./isContainer";
+import { isPrimitive } from "./isPrimitive";
 
 /**
  * Creates a `ReadManager`
@@ -23,38 +16,28 @@ export function createReadManager<S extends StoreValue>(): ReadManager<S> {
    * value is guaranteed to conform to the `StoreValue` invariants since we only
    * structurally clone values that are already in the store
    */
-  function clone<P extends Path<S>, V extends StoreValue>(
-    path: P | PathFor<S, V>,
-    value: Value<S, P, V>
-  ): Value<S, P, V> {
+  function clone<V extends StoreValue>(path: PathFor<S, V>, value: V): V {
     if (isPrimitive(value)) {
       return value;
     }
 
     if (frozenClones.has(String(path))) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return frozenClones.get(String(path))! as Value<S, P, V>;
+      return frozenClones.get(String(path))! as V;
     }
 
     const result = cloneComplex(value as Complex);
 
     if (isContainer(value)) {
       Object.entries(value).forEach(function([key, value]) {
-        Reflect.set(
-          result,
-          key,
-          clone(
-            [...path, key] as Path<S>,
-            value as Value<S, Path<S>, StoreValue>
-          )
-        );
+        Reflect.set(result, key, clone([...path, key] as Path<S>, value));
       });
     }
 
     Object.freeze(result);
     frozenClones.set(String(path), result);
 
-    return result as Value<S, P, V>;
+    return result as V;
   }
 
   /**
@@ -75,7 +58,7 @@ export function createReadManager<S extends StoreValue>(): ReadManager<S> {
 
   return {
     clone,
-    reset,
-    reconcile
+    reconcile,
+    reset
   };
 }

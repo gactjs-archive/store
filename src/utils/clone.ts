@@ -1,8 +1,8 @@
-import { isPrimitive } from "./isPrimitive";
-import { isContainer } from "./isContainer";
+import { Complex, StoreValue } from "../types";
 import { cloneComplex } from "./cloneComplex";
+import { isContainer } from "./isContainer";
+import { isPrimitive } from "./isPrimitive";
 import { warning } from "./warning";
-import { StoreValue, Complex } from "../types";
 
 function cloneHelper<T extends StoreValue>(
   value: T,

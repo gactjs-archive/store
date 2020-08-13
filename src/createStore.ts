@@ -1,81 +1,79 @@
-import { deepFreeze } from "./utils/deepFreeze";
-import { clone } from "./utils/clone";
-import { createReadManager } from "./utils/createReadManager";
-import { getByPath } from "./utils/getByPath";
-import { getContainer } from "./utils/getContainer";
-import { createPathFactory } from "./utils/createPathFactory";
-import { computePathLineage } from "./utils/computePathLineage";
 import {
+  CRUDEvent,
+  EventType,
+  GetEvent,
+  InitEvent,
+  Listener,
+  PathFor,
+  RemoveEvent,
+  SetEvent,
+  Store,
+  StoreEvent,
   StoreRecord,
   StoreValue,
-  PathFor,
-  Path,
-  Value,
-  Updater,
-  EventType,
-  InitEvent,
-  GetEvent,
-  SetEvent,
-  UpdateEvent,
-  RemoveEvent,
-  CRUDEvent,
   TransactionEvent,
-  StoreEvent,
-  Listener,
-  Store
+  UpdateEvent,
+  Updater
 } from "./types";
+import { clone } from "./utils/clone";
+import { computePathLineage } from "./utils/computePathLineage";
+import { createPathFactory } from "./utils/createPathFactory";
+import { createReadManager } from "./utils/createReadManager";
+import { deepFreeze } from "./utils/deepFreeze";
+import { getByPath } from "./utils/getByPath";
+import { getContainer } from "./utils/getContainer";
 
 function createInitEvent<S extends StoreValue>(state: S): InitEvent<S> {
   return deepFreeze({ state, type: EventType.Init });
 }
 
-function createGetEvent<S extends StoreValue>(
-  path: Path<S>,
-  value: StoreValue,
+function createGetEvent<S extends StoreValue, V extends StoreValue>(
+  path: PathFor<S, V>,
+  value: V,
   meta: StoreRecord | null
-): GetEvent<S> {
-  return deepFreeze({ path, value, meta, type: EventType.Get });
+): GetEvent<S, V> {
+  return deepFreeze({ meta, path, type: EventType.Get, value });
 }
 
-function createSetEvent<S extends StoreValue>(
-  path: Path<S>,
-  prevValue: StoreValue,
-  value: StoreValue,
+function createSetEvent<S extends StoreValue, V extends StoreValue>(
+  path: PathFor<S, V>,
+  prevValue: V | null,
+  value: V,
   meta: StoreRecord | null
-): SetEvent<S> {
+): SetEvent<S, V> {
   return deepFreeze({
-    prevValue,
-    value,
-    path,
     meta,
-    type: EventType.Set
+    path,
+    prevValue,
+    type: EventType.Set,
+    value
   });
 }
 
-function createUpdateEvent<S extends StoreValue>(
-  path: Path<S>,
-  prevValue: StoreValue,
-  value: StoreValue,
+function createUpdateEvent<S extends StoreValue, V extends StoreValue>(
+  path: PathFor<S, V>,
+  prevValue: V,
+  value: V,
   meta: StoreRecord | null
-): UpdateEvent<S> {
+): UpdateEvent<S, V> {
   return deepFreeze({
+    meta,
     path,
     prevValue,
-    value,
-    meta,
-    type: EventType.Update
+    type: EventType.Update,
+    value
   });
 }
 
-function createRemoveEvent<S extends StoreValue>(
-  path: Path<S>,
-  prevValue: StoreValue,
+function createRemoveEvent<S extends StoreValue, V extends StoreValue>(
+  path: PathFor<S, V>,
+  prevValue: V,
   meta: StoreRecord | null
-): RemoveEvent<S> {
+): RemoveEvent<S, V> {
   return deepFreeze({
+    meta,
     path,
     prevValue,
-    meta,
     type: EventType.Remove
   });
 }
@@ -85,9 +83,9 @@ function createTransactionEvent<S extends StoreValue>(
   meta: StoreRecord | null
 ): TransactionEvent<S> {
   return deepFreeze({
+    events: transactionEvents,
     meta,
-    type: EventType.Transaction,
-    events: transactionEvents
+    type: EventType.Transaction
   });
 }
 
@@ -110,9 +108,11 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
   /**
    * Distributes a `StoreEvent` to all listeners
    */
-  function notifyListeners(event: StoreEvent<S>): void {
+  function notifyListeners<V extends StoreValue>(
+    event: StoreEvent<S, V>
+  ): void {
     for (const listener of listeners) {
-      listener(event);
+      listener(event as StoreEvent<S>);
     }
   }
 
@@ -123,9 +123,9 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
    * to the transaction events. Otherwise, we notify listeners like normal.
    *
    */
-  function announce(event: CRUDEvent<S>): void {
+  function announce<V extends StoreValue>(event: CRUDEvent<S, V>): void {
     if (activeTransaction) {
-      transactionEvents.push(event);
+      transactionEvents.push((event as unknown) as CRUDEvent<S>);
     } else {
       notifyListeners(event);
     }
@@ -231,13 +231,13 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
    * @typeParam P - the path of the value
    * @typeParam V - the type of value at P
    */
-  function get<P extends Path<S>, V extends StoreValue>(
-    path: P | PathFor<S, V>,
+  function get<V extends StoreValue>(
+    path: PathFor<S, V>,
     meta: StoreRecord | null = null
-  ): Value<S, P, V> {
+  ): V {
     const value = readManager.clone(path, getByPath(state, path));
 
-    announce(createGetEvent(path as Path<S>, value as StoreValue, meta));
+    announce(createGetEvent(path, value, meta));
 
     return value;
   }
@@ -251,21 +251,21 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
    * @typeParam P - the path of the value
    * @typeParam V - the type of value at P
    */
-  function set<P extends Path<S>, V extends StoreValue>(
-    path: P | PathFor<S, V>,
-    value: Value<S, P, V>,
+  function set<V extends StoreValue>(
+    path: PathFor<S, V>,
+    value: V,
     meta: StoreRecord | null = null
   ): void {
-    let prevValue: Value<S, P, V> | null = null;
+    let prevValue: V | null = null;
 
-    value = clone(value as StoreValue) as Value<S, P, V>;
+    value = clone(value); //as Value<S, P, V>;
 
     if (path.length === 0) {
       // will never use this `state` again, so it's okay if it gets frozen
-      prevValue = state as Value<S, P, V>;
+      prevValue = (state as unknown) as V;
 
       readManager.reset();
-      state = value as S;
+      state = (value as unknown) as S;
     } else {
       const container = getContainer(state, path);
       const key = path[path.length - 1];
@@ -273,21 +273,14 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
       if (Object.prototype.hasOwnProperty.call(container, key)) {
         prevValue = Reflect.get(container, key);
 
-        readManager.reconcile(
-          computePathLineage(path, prevValue as Value<S, P, V>)
-        );
+        readManager.reconcile(computePathLineage(path, prevValue));
       }
 
       Reflect.set(container, key, value);
     }
 
     announce(
-      createSetEvent(
-        path as Path<S>,
-        prevValue as StoreValue,
-        readManager.clone(path, value) as StoreValue,
-        meta
-      )
+      createSetEvent(path, prevValue, readManager.clone(path, value), meta)
     );
   }
 
@@ -301,27 +294,27 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
    * @typeParam P - the path of the value
    * @typeParam V - the type of value at P
    */
-  function update<P extends Path<S>, V extends StoreValue>(
-    path: P | PathFor<S, V>,
-    updater: Updater<Value<S, P, V>>,
+  function update<V extends StoreValue>(
+    path: PathFor<S, V>,
+    updater: Updater<V>,
     meta: StoreRecord | null = null
   ): void {
     activeUpdate = true;
 
-    let prevValue: Value<S, P, V>;
-    let value: Value<S, P, V>;
+    let prevValue: V;
+    let value: V;
     if (path.length === 0) {
       prevValue = readManager.clone(path, getByPath(state, path));
       readManager.reset();
 
       // will never use this `state` again, so we can allow it to be mutated directly
-      value = state as Value<S, P, V>;
+      value = (state as unknown) as V;
       const updatedValue = updater(value);
       if (updatedValue !== undefined) {
         value = updatedValue;
       }
 
-      state = clone(value as StoreValue) as S;
+      state = (clone(value) as unknown) as S;
     } else {
       const container = getContainer(state, path);
       const key = path[path.length - 1];
@@ -340,7 +333,7 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
         value = updatedValue;
       }
 
-      value = clone(value as StoreValue) as Value<S, P, V>;
+      value = clone(value);
 
       Reflect.set(container, key, value);
     }
@@ -348,12 +341,7 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
     activeUpdate = false;
 
     announce(
-      createUpdateEvent(
-        path as Path<S>,
-        prevValue as StoreValue,
-        readManager.clone(path, value) as StoreValue,
-        meta
-      )
+      createUpdateEvent(path, prevValue, readManager.clone(path, value), meta)
     );
   }
 
@@ -363,8 +351,8 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
    * @typeParam P - the path of the value
    * @typeParam V - the type of value at P
    */
-  function remove<P extends Path<S>, V extends StoreValue>(
-    path: P | PathFor<S, V>,
+  function remove<V extends StoreValue>(
+    path: PathFor<S, V>,
     meta: StoreRecord | null = null
   ): void {
     if (path.length === 0) {
@@ -373,7 +361,7 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
 
     const container = getContainer(state, path);
     const key = path[path.length - 1];
-    const prevValue: Value<S, P, V> = Reflect.get(container, key);
+    const prevValue: V = Reflect.get(container, key);
 
     if (!Object.prototype.hasOwnProperty.call(container, key)) {
       throw Error(`${path} does not exist`);
@@ -383,7 +371,7 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
 
     readManager.reconcile(computePathLineage(path, prevValue));
 
-    announce(createRemoveEvent(path as Path<S>, prevValue as StoreValue, meta));
+    announce(createRemoveEvent(path, prevValue, meta));
   }
 
   /**
@@ -464,13 +452,13 @@ export function createStore<S extends StoreValue>(initialState: S): Store<S> {
   }
 
   return deepFreeze({
-    subscribe,
     canMutateSubscriptions,
-    path,
     get: makeInitAware(makePathFactoryAware(get)),
-    set: enhanceWriter(set),
-    update: enhanceWriter(update),
+    path,
     remove: enhanceWriter(remove),
-    transaction: makeInitAware(transaction)
+    set: enhanceWriter(set),
+    subscribe,
+    transaction: makeInitAware(transaction),
+    update: enhanceWriter(update)
   });
 }

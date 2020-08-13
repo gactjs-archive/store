@@ -1,6 +1,6 @@
 {
   "name": "@gact/store",
-  "version": "0.0.0-rc.5",
+  "version": "0.0.0-rc.6",
   "description": "Accountable centralized state tree",
   "keywords": [
     "store",
@@ -24,7 +24,7 @@
   },
   "scripts": {
     "lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "yarn eslint . --fix --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "yarn eslint src --fix --ext .js,.jsx,.ts,.tsx",
     "build": "rollup -c rollup.config.js",
     "start": "rollup -c rollup.config.js -w",
     "test": "jest --coverage",
@@ -60,7 +60,7 @@
       }
     },
     "collectCoverageFrom": [
-      "src/*.{js,ts}"
+      "src/**/*.{js,jsx,ts,tsx}"
     ],
     "globals": {
       "ts-jest": {
@@ -69,21 +69,22 @@
     }
   },
   "devDependencies": {
-    "@types/jest": "^25.2.1",
+    "@types/jest": "^26.0.9",
     "@typescript-eslint/eslint-plugin": "^2.22.0",
     "@typescript-eslint/parser": "^2.22.0",
     "coveralls": "^3.0.7",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-sort-keys-fix": "^1.1.1",
     "eslint-plugin-tsdoc": "^0.2.3",
     "husky": "^3.0.9",
-    "jest": "^25.3.0",
+    "jest": "^26.4.0",
     "prettier": "^1.19.1",
     "rollup": "^1.26.5",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.25.2",
     "ts-jest": "^25.3.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.7"
   }
 }

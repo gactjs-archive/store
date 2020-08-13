@@ -1,3 +1,4 @@
+import { Path } from "../../src/types";
 import { createReadManager } from "../../src/utils/createReadManager";
 
 describe("createReadManager", function() {
@@ -13,7 +14,7 @@ describe("createReadManager", function() {
     test("cloning a Primitive returns the Primitive", function() {
       const readManager = createReadManager<State>();
 
-      expect(readManager.clone(["a"], 100)).toBe(100);
+      expect(readManager.clone<number>(["a"], 100)).toBe(100);
     });
   });
 
@@ -49,8 +50,9 @@ describe("createReadManager", function() {
       const readManager = createReadManager<State>();
       const arr = [0, 1, 2];
       const arrClone = readManager.clone(["b"], arr);
+      const paths: Set<Path<State>> = new Set([["b"]]);
 
-      readManager.reconcile([["b"]]);
+      readManager.reconcile(paths);
       expect(readManager.clone(["b"], arr)).not.toBe(arrClone);
     });
   });

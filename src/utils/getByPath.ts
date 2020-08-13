@@ -1,5 +1,5 @@
+import { PathFor, StoreValue } from "../types";
 import { isContainer } from "./isContainer";
-import { StoreValue, Path, PathFor, Value } from "../types";
 
 /**
  * Gets the value in the provided state at the provided path.
@@ -11,11 +11,10 @@ import { StoreValue, Path, PathFor, Value } from "../types";
  * @typeParam P - the path
  * @typeParam V - the value in S at P
  */
-export function getByPath<
-  S extends StoreValue,
-  P extends Path<S>,
-  V extends StoreValue
->(state: S, path: P | PathFor<S, V>): Value<S, P, V> {
+export function getByPath<S extends StoreValue, V extends StoreValue>(
+  state: S,
+  path: PathFor<S, V>
+): V {
   let value: StoreValue = state;
   for (const pathPart of path) {
     if (
@@ -30,5 +29,5 @@ export function getByPath<
     value = Reflect.get(value, pathPart);
   }
 
-  return value as Value<S, P, V>;
+  return value as V;
 }

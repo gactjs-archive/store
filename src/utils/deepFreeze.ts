@@ -1,5 +1,5 @@
-import { isPrimitive } from "./isPrimitive";
 import { isContainer } from "./isContainer";
+import { isPrimitive } from "./isPrimitive";
 
 /**
  * Deep freezes values

@@ -1,4 +1,4 @@
-import { StoreValue, Path, PathFactory, PathFactoryResult } from "../types";
+import { Path, PathFactory, PathFactoryResult, StoreValue } from "../types";
 
 /**
  * Creates a path factory
@@ -41,5 +41,5 @@ export function createPathFactory<S extends StoreValue>(): PathFactoryResult<
     }
   }
 
-  return { path: path as PathFactory<S>, fromFactory };
+  return { fromFactory, path: path as PathFactory<S> };
 }

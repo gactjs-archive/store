@@ -1,15 +1,15 @@
 import {
-  StoreValue,
-  EventType,
-  InitEvent,
-  GetEvent,
-  SetEvent,
-  UpdateEvent,
-  RemoveEvent,
-  WriteEvent,
   CRUDEvent,
+  EventType,
+  GetEvent,
+  InitEvent,
+  RemoveEvent,
+  SetEvent,
+  StoreEvent,
+  StoreValue,
   TransactionEvent,
-  StoreEvent
+  UpdateEvent,
+  WriteEvent
 } from "../types";
 
 export function isInitEvent<S extends StoreValue>(
@@ -18,33 +18,33 @@ export function isInitEvent<S extends StoreValue>(
   return event.type === EventType.Init;
 }
 
-export function isGetEvent<S extends StoreValue>(
-  event: StoreEvent<S>
-): event is GetEvent<S> {
+export function isGetEvent<S extends StoreValue, V extends StoreValue>(
+  event: StoreEvent<S, V>
+): event is GetEvent<S, V> {
   return event.type === EventType.Get;
 }
 
-export function isSetEvent<S extends StoreValue>(
-  event: StoreEvent<S>
-): event is SetEvent<S> {
+export function isSetEvent<S extends StoreValue, V extends StoreValue>(
+  event: StoreEvent<S, V>
+): event is SetEvent<S, V> {
   return event.type === EventType.Set;
 }
 
-export function isUpdateEvent<S extends StoreValue>(
-  event: StoreEvent<S>
-): event is UpdateEvent<S> {
+export function isUpdateEvent<S extends StoreValue, V extends StoreValue>(
+  event: StoreEvent<S, V>
+): event is UpdateEvent<S, V> {
   return event.type === EventType.Update;
 }
 
-export function isRemoveEvent<S extends StoreValue>(
-  event: StoreEvent<S>
-): event is RemoveEvent<S> {
+export function isRemoveEvent<S extends StoreValue, V extends StoreValue>(
+  event: StoreEvent<S, V>
+): event is RemoveEvent<S, V> {
   return event.type === EventType.Remove;
 }
 
-export function isWriteEvent<S extends StoreValue>(
-  event: StoreEvent<S>
-): event is WriteEvent<S> {
+export function isWriteEvent<S extends StoreValue, V extends StoreValue>(
+  event: StoreEvent<S, V>
+): event is WriteEvent<S, V> {
   return (
     event.type === EventType.Set ||
     event.type === EventType.Update ||
@@ -52,9 +52,9 @@ export function isWriteEvent<S extends StoreValue>(
   );
 }
 
-export function isCRUDEvent<S extends StoreValue>(
-  event: StoreEvent<S>
-): event is CRUDEvent<S> {
+export function isCRUDEvent<S extends StoreValue, V extends StoreValue>(
+  event: StoreEvent<S, V>
+): event is CRUDEvent<S, V> {
   return (
     event.type === EventType.Get ||
     event.type === EventType.Set ||

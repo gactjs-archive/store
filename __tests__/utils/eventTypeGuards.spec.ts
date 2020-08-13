@@ -1,23 +1,23 @@
 import {
-  isInitEvent,
-  isGetEvent,
-  isSetEvent,
-  isUpdateEvent,
-  isRemoveEvent,
-  isWriteEvent,
-  isCRUDEvent,
-  isTransactionEvent
-} from "../../src/utils/eventTypeGuards";
-import {
-  StoreRecord,
   EventType,
-  InitEvent,
   GetEvent,
-  SetEvent,
-  UpdateEvent,
+  InitEvent,
   RemoveEvent,
-  TransactionEvent
+  SetEvent,
+  StoreRecord,
+  TransactionEvent,
+  UpdateEvent
 } from "../../src/types";
+import {
+  isCRUDEvent,
+  isGetEvent,
+  isInitEvent,
+  isRemoveEvent,
+  isSetEvent,
+  isTransactionEvent,
+  isUpdateEvent,
+  isWriteEvent
+} from "../../src/utils/eventTypeGuards";
 
 describe("eventTypeGuards", function() {
   type State = {
@@ -28,44 +28,44 @@ describe("eventTypeGuards", function() {
   const initialState: State = { a: "a", b: { c: 100 } };
 
   const initEvent: InitEvent<State> = {
-    type: EventType.Init,
-    state: initialState
+    state: initialState,
+    type: EventType.Init
   };
 
-  const getEvent: GetEvent<State> = {
+  const getEvent: GetEvent<State, string> = {
+    meta: null,
+    path: ["a"],
     type: EventType.Get,
-    path: ["a"],
-    value: "a",
-    meta: null
+    value: "a"
   };
 
-  const setEvent: SetEvent<State> = {
+  const setEvent: SetEvent<State, string> = {
+    meta: null,
+    path: ["a"],
+    prevValue: "a",
     type: EventType.Set,
-    path: ["a"],
-    prevValue: "a",
-    value: "b",
-    meta: null
+    value: "b"
   };
 
-  const updateEvent: UpdateEvent<State> = {
+  const updateEvent: UpdateEvent<State, string> = {
+    meta: null,
+    path: ["a"],
+    prevValue: "a",
     type: EventType.Update,
-    path: ["a"],
-    prevValue: "a",
-    value: "b",
-    meta: null
+    value: "b"
   };
 
-  const removeEvent: RemoveEvent<State> = {
-    type: EventType.Remove,
+  const removeEvent: RemoveEvent<State, number> = {
+    meta: null,
     path: ["b", "c"],
     prevValue: 100,
-    meta: null
+    type: EventType.Remove
   };
 
   const transactionEvent: TransactionEvent<State> = {
-    type: EventType.Transaction,
     events: [getEvent, setEvent],
-    meta: null
+    meta: null,
+    type: EventType.Transaction
   };
 
   test("isInitEvent", function() {

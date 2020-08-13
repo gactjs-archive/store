@@ -103,7 +103,7 @@ export type ContainerKey<S> = Exclude<
   | "toLocaleString"
 >;
 
-export type _PathFor<S extends StoreValue, V extends StoreValue> =
+export type PathFor<S extends StoreValue, V extends StoreValue> =
   | MatchThen<S, V, []>
   | ValueOf<
       {
@@ -129,11 +129,23 @@ export type _PathFor<S extends StoreValue, V extends StoreValue> =
                                       {
                                         [K5 in ContainerKey<
                                           S[K1][K2][K3][K4]
-                                        >]: MatchThen<
-                                          S[K1][K2][K3][K4][K5],
-                                          V,
-                                          [K1, K2, K3, K4, K5]
-                                        >;
+                                        >]:
+                                          | MatchThen<
+                                              S[K1][K2][K3][K4][K5],
+                                              V,
+                                              [K1, K2, K3, K4, K5]
+                                            >
+                                          | ValueOf<
+                                              {
+                                                [K6 in ContainerKey<
+                                                  S[K1][K2][K3][K4][K5]
+                                                >]: MatchThen<
+                                                  S[K1][K2][K3][K4][K5][K6],
+                                                  V,
+                                                  [K1, K2, K3, K4, K5, K6]
+                                                >;
+                                              }
+                                            >;
                                       }
                                     >;
                               }
@@ -146,25 +158,11 @@ export type _PathFor<S extends StoreValue, V extends StoreValue> =
     >;
 
 /**
- * `PathsFor` represents the paths in S with the value V.
- *
- * @remarks
- * Paths up to length 5 (e.g ["a", "b", "c", "d", "e", "f"]) are recognized.
- *
- * @typeParam S - the state tree
- * @typeParam V - the type of value we want
- */
-export type PathFor<
-  S extends StoreValue,
-  V extends StoreValue
-> = StoreValue extends V ? never : _PathFor<S, V>;
-
-/**
  * `Path` represents all the paths in S
  *
  * @typeParam S - the state tree
  */
-export type Path<S extends StoreValue> = _PathFor<S, StoreValue>;
+export type Path<S extends StoreValue> = PathFor<S, StoreValue>;
 
 /**
  * `PathFactory` makes it easy to construct and compose paths
@@ -334,6 +332,97 @@ export type PathFactory<S extends StoreValue> = {
   ): V[K1] extends StoreValue ? PathFor<S, V[K1]> : never;
 
   <
+    K1 extends ContainerKey<S>,
+    K2 extends ContainerKey<S[K1]>,
+    K3 extends ContainerKey<S[K1][K2]>,
+    K4 extends ContainerKey<S[K1][K2][K3]>,
+    K5 extends ContainerKey<S[K1][K2][K3][K4]>,
+    K6 extends ContainerKey<S[K1][K2][K3][K4][K5]>
+  >(
+    key1: K1,
+    key2: K2,
+    key3: K3,
+    key4: K4,
+    key5: K5,
+    key6: K6
+  ): [K1, K2, K3, K4, K5, K6];
+
+  <
+    K1 extends ContainerKey<S>,
+    K2 extends ContainerKey<S[K1]>,
+    K3 extends ContainerKey<S[K1][K2]>,
+    K4 extends ContainerKey<S[K1][K2][K3]>,
+    K5 extends ContainerKey<S[K1][K2][K3][K4]>,
+    K6 extends ContainerKey<S[K1][K2][K3][K4][K5]>
+  >(
+    path: [K1],
+    key2: K2,
+    key3: K3,
+    key4: K4,
+    key5: K5,
+    key6: K6
+  ): [K1, K2, K3, K4, K5, K6];
+
+  <
+    K1 extends ContainerKey<S>,
+    K2 extends ContainerKey<S[K1]>,
+    K3 extends ContainerKey<S[K1][K2]>,
+    K4 extends ContainerKey<S[K1][K2][K3]>,
+    K5 extends ContainerKey<S[K1][K2][K3][K4]>,
+    K6 extends ContainerKey<S[K1][K2][K3][K4][K5]>
+  >(
+    path: [K1, K2],
+    key3: K3,
+    key4: K4,
+    key5: K5,
+    key6: K6
+  ): [K1, K2, K3, K4, K5, K6];
+
+  <
+    K1 extends ContainerKey<S>,
+    K2 extends ContainerKey<S[K1]>,
+    K3 extends ContainerKey<S[K1][K2]>,
+    K4 extends ContainerKey<S[K1][K2][K3]>,
+    K5 extends ContainerKey<S[K1][K2][K3][K4]>,
+    K6 extends ContainerKey<S[K1][K2][K3][K4][K5]>
+  >(
+    path: [K1, K2, K3],
+    key4: K4,
+    key5: K5,
+    key6: K6
+  ): [K1, K2, K3, K4, K5, K6];
+
+  <
+    K1 extends ContainerKey<S>,
+    K2 extends ContainerKey<S[K1]>,
+    K3 extends ContainerKey<S[K1][K2]>,
+    K4 extends ContainerKey<S[K1][K2][K3]>,
+    K5 extends ContainerKey<S[K1][K2][K3][K4]>,
+    K6 extends ContainerKey<S[K1][K2][K3][K4][K5]>
+  >(
+    path: [K1, K2, K3, K4],
+    key5: K5,
+    key6: K6
+  ): [K1, K2, K3, K4, K5, K6];
+
+  <
+    K1 extends ContainerKey<S>,
+    K2 extends ContainerKey<S[K1]>,
+    K3 extends ContainerKey<S[K1][K2]>,
+    K4 extends ContainerKey<S[K1][K2][K3]>,
+    K5 extends ContainerKey<S[K1][K2][K3][K4]>,
+    K6 extends ContainerKey<S[K1][K2][K3][K4][K5]>
+  >(
+    path: [K1, K2, K3, K4, K5],
+    key6: K6
+  ): [K1, K2, K3, K4, K5, K6];
+
+  <V extends StoreValue, K1 extends ContainerKey<V>>(
+    path: PathFor<S, V>,
+    key1: K1
+  ): V[K1] extends StoreValue ? PathFor<S, V[K1]> : never;
+
+  <
     V extends StoreValue,
     K1 extends ContainerKey<V>,
     K2 extends ContainerKey<V[K1]>
@@ -403,55 +492,6 @@ export type PathFactoryResult<S extends StoreValue> = {
 };
 
 /**
- * `ValueAt` represents the value in S at P
- *
- * @typeParam S - the state tree
- * @typeParam P - the path of the value
- */
-export type ValueAt<S extends StoreValue, P extends Path<S>> = P extends
-  | []
-  | [infer K1]
-  | [infer K1, infer K2]
-  | [infer K1, infer K2, infer K3]
-  | [infer K1, infer K2, infer K3, infer K4]
-  | [infer K1, infer K2, infer K3, infer K4, infer K5]
-  | [infer K1, infer K2, infer K3, infer K4, infer K5]
-  ? K1 extends ContainerKey<S>
-    ? K2 extends ContainerKey<S[K1]>
-      ? K3 extends ContainerKey<S[K1][K2]>
-        ? K4 extends ContainerKey<S[K1][K2][K3]>
-          ? K5 extends ContainerKey<S[K1][K2][K3][K4]>
-            ? S[K1][K2][K3][K4][K5]
-            : S[K1][K2][K3][K4]
-          : S[K1][K2][K3]
-        : S[K1][K2]
-      : S[K1]
-    : S
-  : never;
-
-/**
- * `Value` extends `ValueAt` to handle both the generic and concrete case
- *
- * @remarks
- * A limitation of TypeScript is it cannot do {@link https://github.com/microsoft/TypeScript/issues/37675 |
- * "higher-order reasoning and immediate resolution at the same time".}
- *
- * Value works around this limitation by employing a two-pronged approach.
- * In the generic case, V will be inferred, and we can simply return it.
- * In the concrete case, V will not be inferred and be we can use the resolved
- * path P and `ValueAt` to recover the the type of value.
- *
- * @typeParam S - the state tree
- * @typeParam P - the path of the value
- * @typeParam V - the type of the value at P in S (not inferred in the concrete case)
- */
-export type Value<
-  S extends StoreValue,
-  P extends Path<S>,
-  V extends StoreValue
-> = StoreValue extends V ? ValueAt<S, P> : V;
-
-/**
  * Enables efficient immutable reads through structural sharing and deep freezing
  *
  * @typeParam S - the state tree
@@ -459,10 +499,7 @@ export type Value<
 export type ReadManager<S extends StoreValue> = {
   reset(): void;
   reconcile(paths: Set<Path<S>>): void;
-  clone<P extends Path<S>, V extends StoreValue>(
-    path: P | PathFor<S, V>,
-    value: Value<S, P, V>
-  ): Value<S, P, V>;
+  clone<V extends StoreValue>(path: PathFor<S, V>, value: V): V;
 };
 
 export enum EventType {
@@ -505,10 +542,10 @@ export type InitEvent<S extends StoreValue> = {
  * @remarks
  * `GetEvent` is completely frozen (i.e. immutable).
  */
-export type GetEvent<S extends StoreValue> = {
+export type GetEvent<S extends StoreValue, V extends StoreValue> = {
   type: EventType.Get;
-  path: Path<S>;
-  value: StoreValue;
+  path: PathFor<S, V>;
+  value: V;
   meta: StoreRecord | null;
 };
 
@@ -518,11 +555,11 @@ export type GetEvent<S extends StoreValue> = {
  * @remarks
  * `SetEvent` is completely frozen (i.e. immutable).
  */
-export type SetEvent<S extends StoreValue> = {
+export type SetEvent<S extends StoreValue, V extends StoreValue> = {
   type: EventType.Set;
-  path: Path<S>;
-  prevValue: StoreValue;
-  value: StoreValue;
+  path: PathFor<S, V>;
+  prevValue: V | null;
+  value: V;
   meta: StoreRecord | null;
 };
 
@@ -532,11 +569,11 @@ export type SetEvent<S extends StoreValue> = {
  * @remarks
  * `UpdateEvent` is completely frozen (i.e. immutable).
  */
-export type UpdateEvent<S extends StoreValue> = {
+export type UpdateEvent<S extends StoreValue, V extends StoreValue> = {
   type: EventType.Update;
-  path: Path<S>;
-  prevValue: StoreValue;
-  value: StoreValue;
+  path: PathFor<S, V>;
+  prevValue: V;
+  value: V;
   meta: StoreRecord | null;
 };
 
@@ -546,10 +583,10 @@ export type UpdateEvent<S extends StoreValue> = {
  * @remarks
  * `RemoveEvent` is completely frozen (i.e. immutable).
  */
-export type RemoveEvent<S extends StoreValue> = {
+export type RemoveEvent<S extends StoreValue, V extends StoreValue> = {
   type: EventType.Remove;
-  path: Path<S>;
-  prevValue: StoreValue;
+  path: PathFor<S, V>;
+  prevValue: V;
   meta: StoreRecord | null;
 };
 
@@ -559,10 +596,10 @@ export type RemoveEvent<S extends StoreValue> = {
  *  @remarks
  * `WriteEvent`s are completely frozen (i.e. immutable).
  */
-export type WriteEvent<S extends StoreValue> =
-  | SetEvent<S>
-  | UpdateEvent<S>
-  | RemoveEvent<S>;
+export type WriteEvent<S extends StoreValue, V extends StoreValue> =
+  | SetEvent<S, V>
+  | UpdateEvent<S, V>
+  | RemoveEvent<S, V>;
 
 /**
  * `CrudEvent`s capture read and writes to the store.
@@ -570,7 +607,10 @@ export type WriteEvent<S extends StoreValue> =
  *  @remarks
  * `CrudEvent`s are completely frozen (i.e. immutable).
  */
-export type CRUDEvent<S extends StoreValue> = GetEvent<S> | WriteEvent<S>;
+export type CRUDEvent<
+  S extends StoreValue,
+  V extends StoreValue = StoreValue
+> = GetEvent<S, V> | WriteEvent<S, V>;
 
 /**
  * `TransactionEvent` captures a transaction.
@@ -590,10 +630,10 @@ export type TransactionEvent<S extends StoreValue> = {
  * @remarks
  * `StoreEvent`s are completely frozen (i.e. immutable).
  */
-export type StoreEvent<S extends StoreValue> =
-  | InitEvent<S>
-  | CRUDEvent<S>
-  | TransactionEvent<S>;
+export type StoreEvent<
+  S extends StoreValue,
+  V extends StoreValue = StoreValue
+> = InitEvent<S> | CRUDEvent<S, V> | TransactionEvent<S>;
 
 /**
  * `Listener`s subscribe to the stream of `StoreEvent`s.
@@ -620,27 +660,21 @@ export type Store<S extends StoreValue> = {
 
   path: PathFactory<S>;
 
-  get<P extends Path<S>, V extends StoreValue>(
-    path: P | PathFor<S, V>,
-    meta?: StoreValue
-  ): Value<S, P, V>;
+  get<V extends StoreValue>(path: PathFor<S, V>, meta?: StoreValue): V;
 
-  set<P extends Path<S>, V extends StoreValue>(
-    path: P | PathFor<S, V>,
-    value: Value<S, P, V>,
+  set<V extends StoreValue>(
+    path: PathFor<S, V>,
+    value: V,
     meta?: StoreValue
   ): void;
 
-  update<P extends Path<S>, V extends StoreValue>(
-    path: P | PathFor<S, V>,
-    updater: Updater<Value<S, P, V>>,
+  update<V extends StoreValue>(
+    path: PathFor<S, V>,
+    updater: Updater<V>,
     meta?: StoreValue
   ): void;
 
-  remove<P extends Path<S>, V extends StoreValue>(
-    path: P | PathFor<S, V>,
-    meta?: StoreValue
-  ): void;
+  remove<V extends StoreValue>(path: PathFor<S, V>, meta?: StoreValue): void;
 
   transaction(transaction: () => void, meta?: StoreValue): void;
 };

@@ -1,5 +1,5 @@
-import { isStoreRecord } from "./isStoreRecord";
 import { Container } from "../types";
+import { isStoreRecord } from "./isStoreRecord";
 
 /**
  * A type guard for Container
